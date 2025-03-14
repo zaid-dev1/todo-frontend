@@ -7,17 +7,16 @@ const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
   const getAllTasks = async () => {
     try {
-        setLoading(true);
+     
       const response = await axios.get(backendUrl + "/tasks");
        console.log("data", response);
         setTasks(response.data);
  
     } catch (error) {
       toast.error(error.error);
-    }setLoading(false);
+    }
   };
 
   const value = {
@@ -25,8 +24,6 @@ const AppContextProvider = (props) => {
     setTasks,
     backendUrl,
     getAllTasks,
-    loading,
-    setLoading,
   };
 
   useEffect(() => {

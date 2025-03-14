@@ -6,7 +6,7 @@ import { AppContext } from "./AppContext";
 import { ToastContainer, toast } from "react-toastify";
 
 const App = () => {
-  const { tasks, setTasks, backendUrl, getAllTasks, loading } =
+  const { tasks, setTasks, backendUrl, getAllTasks } =
     useContext(AppContext);
   console.log("tasks",tasks)
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -85,11 +85,8 @@ const App = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Modal>
-        {loading ? (
-          <p>Loading data</p>
-        ) : (
-          <>
-            {" "}
+      
+      
             <List
               itemLayout="horizontal"
               dataSource={tasks}
@@ -117,8 +114,7 @@ const App = () => {
               )}
               style={{ marginTop: 20 }}
             />
-          </>
-        )}
+       
 
         <Modal
           title="Confirm Delete"
