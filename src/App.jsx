@@ -6,9 +6,8 @@ import { AppContext } from "./AppContext";
 import { ToastContainer, toast } from "react-toastify";
 
 const App = () => {
-  const { tasks, setTasks, backendUrl, getAllTasks } =
-    useContext(AppContext);
-  console.log("tasks",tasks)
+  const { tasks, backendUrl } = useContext(AppContext);
+  console.log("tasks", tasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -22,36 +21,29 @@ const App = () => {
         name,
         description,
       });
-      if (response.status === 201) {
-        setTasks([...tasks, response.data]);
-        setIsModalOpen(false);
-        setName("");
-        setDescription("");
-        toast.success("New Task added! ✅");
-        getAllTasks();
-      }
+      setIsModalOpen(false);
+      setName("");
+      setDescription("");
+      toast.success("New Task Added!");
     } catch (error) {
       console.error("Error adding task:", error);
-      toast.error("Failed to add task! ❌");
+      toast.error("Failed to add task!");
     }
   };
-
   const confirmDeleteTask = (taskId) => {
     setTaskToDelete(taskId);
     setDeleteModalOpen(true);
   };
 
- 
   const handleDeleteTask = async () => {
     if (!taskToDelete) return;
     try {
       await axios.delete(`${backendUrl}/tasks/${taskToDelete}`);
-      setTasks(tasks.filter((task) => task._id !== taskToDelete));
       setDeleteModalOpen(false);
-      toast.success("Task deleted successfully! 🗑️");
+      toast.info("Task Deleted!");
     } catch (error) {
       console.error("Error deleting task:", error);
-      toast.error("Failed to delete task! ❌");
+      toast.error("Failed to delete task!");
     }
   };
 
@@ -85,36 +77,34 @@ const App = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Modal>
-      
-      
-            <List
-              itemLayout="horizontal"
-              dataSource={tasks}
-              renderItem={(task) => (
-                <List.Item
-                  className="flex justify-between items-center bg-white shadow-lg p-4 rounded-lg mb-4 mx-4 border border-gray-200"
-                  style={{ padding: "10px 10px" }}
-                >
-                  <List.Item.Meta
-                    title={
-                      <span className="font-semibold text-lg">{task.name}</span>
-                    }
-                    description={
-                      <span className="text-gray-600">{task.description}</span>
-                    }
-                  />
-                  <Button
-                    type="primary"
-                    danger
-                    onClick={() => confirmDeleteTask(task._id)}
-                  >
-                    Delete
-                  </Button>
-                </List.Item>
-              )}
-              style={{ marginTop: 20 }}
-            />
-       
+
+        <List
+          itemLayout="horizontal"
+          dataSource={tasks}
+          renderItem={(task) => (
+            <List.Item
+              className="flex justify-between items-center bg-white shadow-lg p-4 rounded-lg mb-4 mx-4 border border-gray-200"
+              style={{ padding: "10px 10px" }}
+            >
+              <List.Item.Meta
+                title={
+                  <span className="font-semibold text-lg">{task.name}</span>
+                }
+                description={
+                  <span className="text-gray-600">{task.description}</span>
+                }
+              />
+              <Button
+                type="primary"
+                danger
+                onClick={() => confirmDeleteTask(task._id)}
+              >
+                Delete
+              </Button>
+            </List.Item>
+          )}
+          style={{ marginTop: 20 }}
+        />
 
         <Modal
           title="Confirm Delete"
