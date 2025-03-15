@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Button, Modal, Input, List } from "antd";
+import { Button, Modal, Input, List, Form } from "antd";
 import "antd/dist/reset.css";
 import React, { useContext, useState } from "react";
 import { AppContext } from "./AppContext";
@@ -9,27 +9,31 @@ const App = () => {
   const { tasks, backendUrl } = useContext(AppContext);
   console.log("tasks", tasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
-
+  const [form] = Form.useForm();
   const handleAddTask = async () => {
-    if (!name || !description) return;
     try {
-      const response = await axios.post(`${backendUrl}/tasks`, {
-        name,
-        description,
-      });
-      setIsModalOpen(false);
-      setName("");
-      setDescription("");
-      toast.success("New Task Added!");
-    } catch (error) {
-      console.error("Error adding task:", error);
-      toast.error("Failed to add task!");
+      const values = await form.validateFields();
+
+      try {
+        await axios.post(`${backendUrl}/tasks`, {
+          name: values.name,
+          description: values.description,
+        });
+
+        setIsModalOpen(false);
+        form.resetFields();
+        toast.success("New Task Added!");
+      } catch (error) {
+        console.error("Error adding task:", error);
+        toast.error("Failed to add task!");
+      }
+    } catch (validationError) {
+      console.log(validationError);
     }
   };
+
   const confirmDeleteTask = (taskId) => {
     setTaskToDelete(taskId);
     setDeleteModalOpen(true);
@@ -65,17 +69,23 @@ const App = () => {
           onOk={handleAddTask}
           onCancel={() => setIsModalOpen(false)}
         >
-          <Input
-            placeholder="Enter Task Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ marginBottom: 10 }}
-          />
-          <Input
-            placeholder="Enter Task Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <Form form={form} layout="vertical">
+            <Form.Item
+              label="Task Name"
+              name="name"
+              rules={[{ required: true, message: "This field is required!" }]}
+            >
+              <Input placeholder="Enter Task Name" />
+            </Form.Item>
+
+            <Form.Item
+              label="Task Description"
+              name="description"
+              rules={[{ required: true, message: "This field is required!" }]}
+            >
+              <Input placeholder="Enter Task Description" />
+            </Form.Item>
+          </Form>
         </Modal>
 
         <List
